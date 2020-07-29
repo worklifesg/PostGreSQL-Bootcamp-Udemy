@@ -120,3 +120,63 @@ ORDER BY first_name DESC;
 
 SELECT store_id,first_name,last_name FROM customer
 ORDER BY store_id DESC,first_name ASC;
+
+ -- ******************* LIMIT Statement ******************* --
+/* LIMIT - limit the number of rows returned for a query
+* useful to see table layout and useful with ORDER BY
+*/
+SELECT * FROM payment
+ORDER BY payment_date DESC -- recent payments
+LIMIT 10; -- 10 recent payment instead of all payments
+
+SELECT * FROM payment
+WHERE amount !=0.00 -- the amount should not be zero
+ORDER BY payment_date DESC -- recent payments
+LIMIT 10; -- 10 recent payment instead of all payments
+
+  /* Challenge 1 ORDER BY
+  * Situation - We want to reward our first 10 paying customers
+  * What are the customers ids of the first 10 customers who created a payment
+  */
+SELECT customer_id FROM payment
+ORDER BY payment_date ASC
+LIMIT 10;
+
+  /* Challenge 2 ORDER BY
+  * Situation - A Customer wants to quickly rent a video to watch over their short lunch break
+  * What are the titles of the 5 shortest(in length of runtime) movies?
+  */
+SELECT title, length FROM film
+ORDER BY length ASC -- length is also SQL query word
+LIMIT 5;
+
+  /* BONUS Question ORDER BY
+  * Situation - IF the previous customer can watch any movie that is 50 minutes or less in
+  * run time, how many options does she have
+  */
+  
+SELECT COUNT(title) FROM film
+WHERE length<=50; -- Not even needed to ORDER BY
+
+ -- ******************* BETWEEN Statement ******************* --
+/* BETWEEN- matches a value against range of values
+* value BETWEEN low AND high -- low(>=), high(<=) - 'Inclusive' --
+* value NOT BETWEEN low AND high -- low(<), high(>) - 'Exclusive' --
+* Date and Timestamp also with BETWEEN and in timestamp starts at 00:00 hours
+*/
+
+SELECT * FROM payment
+LIMIT 2; -- just to check the contents
+
+SELECT * FROM payment
+WHERE amount BETWEEN 8 AND 9; -- amount between 8 and 9
+
+SELECT COUNT(*) FROM payment
+WHERE amount BETWEEN 8 AND 9; -- amount between 8 and 9 - no. of transactions
+
+SELECT COUNT(*) FROM payment
+WHERE amount NOT BETWEEN 8 AND 9; -- amount between 8 and 9 - no. of transactions
+
+SELECT * FROM payment
+WHERE payment_date BETWEEN '2007-02-01' AND '2007-02-15'; 
+-- 15 date is not coming because of timestamp, so always use expected date +1 day more
