@@ -180,3 +180,103 @@ WHERE amount NOT BETWEEN 8 AND 9; -- amount between 8 and 9 - no. of transaction
 SELECT * FROM payment
 WHERE payment_date BETWEEN '2007-02-01' AND '2007-02-15'; 
 -- 15 date is not coming because of timestamp, so always use expected date +1 day more
+
+ -- ******************* IN Statement ******************* --
+/* IN - to check multiple possible value options, to create a condition that quickly
+* checks to see if value if included in the list. 
+* Can be integrated with NOT IN to exclude the values in the list
+*/
+
+SELECT * FROM payment
+LIMIT 2; -- just to check distict values/unique amounts
+
+SELECT DISTINCT(amount) FROM payment
+ORDER BY amount; --list of amount in order
+
+-- To see where we have amounts 0.99 1.98 1.99 in payment
+SELECT * FROM payment
+WHERE amount IN (0.99,1.98,1.99);
+
+--to check how many above payments were there, use COUNT
+SELECT COUNT(*) FROM payment
+WHERE amount IN (0.99,1.98,1.99); -- example 3301 payments
+
+-- to check how many payments were NOT 0.99,1.98,1.99
+SELECT COUNT(*) FROM payment
+WHERE amount NOT IN (0.99,1.98,1.99); -- example 11295 payments
+
+------ to check from string column -------
+
+SELECT * FROM customer
+WHERE first_name IN ('John','Jake','Julie');
+
+ -- ******************* LIKE and ILIKE Statement ******************* --
+/* to match against a general pattern in a string ex. emails ending with @gmail.com
+* LIKE - to perform matching against string data with use of wildcard charcters(%,_)
+* LIKE - case sensitive '%A','%a', can combine pattern matching operators '_her%' 
+* = Theresa,Cheryl
+*/
+
+SELECT * FROM customer -- which people name start with J
+WHERE first_name LIKE 'J%';
+
+SELECT COUNT(*) FROM customer -- how many people name start with J
+WHERE first_name LIKE 'J%'; -- 65 people
+
+SELECT COUNT(*) FROM customer -- how many people name start with J and end with S
+WHERE first_name LIKE 'J%' AND last_name LIKE 'S%'; -- 5 people
+
+-- now if I use lower case
+SELECT COUNT(*) FROM customer -- how many people name start with j and end with s
+WHERE first_name LIKE 'j%' AND last_name LIKE 's%'; -- 0 people
+
+-- Now ILIKE is not case sensitive, then it will give same result of 5 people as before
+SELECT COUNT(*) FROM customer -- how many people name start with j and end with s
+WHERE first_name ILIKE 'j%' AND last_name ILIKE 's%'; -- 5 people
+
+-- Now to check mulitple characters in name like 'er' in the name
+SELECT * FROM customer
+WHERE first_name LIKE '%er%'; -- 58 people
+
+-- combining pattern matching operators % _
+SELECT * FROM customer
+WHERE first_name LIKE '_her%'; -- 4 names resulted out
+
+-- Example: first name starts with A, then order the list by last name 
+
+SELECT * FROM customer
+WHERE first_name LIKE 'A%'
+ORDER BY last_name;
+
+-- Now, we want to remove all people whose last name starts with B
+
+SELECT * FROM customer
+WHERE first_name LIKE 'A%' AND last_name NOT LIKE 'B%'
+ORDER BY last_name;
+
+/* General Challenge SELECT WHERE */
+
+
+-- Situation - How many payment transactions were greater than $5.00?
+SELECT COUNT(*) FROM payment
+WHERE amount > 5; -- 3168
+
+-- Situation - How many actors have first name that starts with the letter P?
+SELECT COUNT(*) FROM actor
+WHERE first_name LIKE 'P%';  -- 5 people
+
+-- Situation - How many unique districts are our customers from?
+SELECT COUNT(DISTINCT(district)) FROM address; -- 378 districts
+
+-- Situation - Retrieve the list of names of those distict districts from previous question
+SELECT DISTINCT(district) FROM address;
+
+-- Situation - How many films have a rating of R and a replacement cost between $5 and $15?
+SELECT COUNT(*) FROM film
+WHERE rating ='R' AND replacement_cost BETWEEN 5 AND 15; -- 52 films
+
+-- Situation - How many films have the work Trueman somewhere in the title?
+SELECT COUNT(*) FROM film
+WHERE title LIKE '%Trueman%'; -- 0 films
+
+--------------------------------- Module 1 Ends --------------------------------------------
