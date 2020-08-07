@@ -31,3 +31,18 @@ HAVING SUM(amount) >100; -- HAVING total_spent > 100 will give error as ALIAS
 SELECT customer_id,amount AS new_name
 FROM payment
 WHERE amount > 2 -- same error if we use new_name instead of original column 'amount'
+
+----- JOINS -----
+
+/* INNER JOIN - will result in the set of records that matches both tables (intersection:Venn)
+* symmetrical JOIN, by default JOIN is treated as INNER JOIN*/
+
+-- JOIN payment and customer table to get speicifc email of a customer_id for a payment
+
+SELECT * FROM payment
+INNER JOIN customer
+ON payment.customer_id=customer.customer_id;
+-- certain columns from each table
+SELECT payment_id,payment.customer_id,first_name FROM payment
+INNER JOIN customer
+ON payment.customer_id=customer.customer_id;
