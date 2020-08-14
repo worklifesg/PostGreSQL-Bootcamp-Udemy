@@ -139,4 +139,18 @@ SELECT * FROM customer_info;
 DROP VIEW IF EXISTS customer_info --- remove the view
 ALTER VIEW customer_info AS c_info -- rename the view
 
+---------------------- IMPORT and EXPORT ---------------------------------
+-- import cammand doesnot create table nad provide correct path toa void errors
+
+/*CREATE TABLE simple(
+A INTEGER,
+B INTEGER,
+C INTEGER
+)*/
+
+-- Have a csv file
+-- Under Schemas -> Table -> simple -> Right click and Import/Export and give
+-- path name and click headers yes to ignore the first row if csv file has names in first row
+SELECT * FROM simple
+			
 -------------------------------- Module Ends ------------------------------------------
