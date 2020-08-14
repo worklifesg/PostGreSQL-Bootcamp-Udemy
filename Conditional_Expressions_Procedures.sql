@@ -110,3 +110,33 @@ SELECT CHAR_LENGTH(CAST(inventory_id AS VARCHAR)) FROM rental; --returns the len
 
 ------- NULLIF ----------
 /* takes two inputs and returns NULL if both are equal otherwise it returns the first argument passed */
+
+------- Views -----------
+/* When we have write some statements again and again, we can use VIEW and call this function
+directly rather than writing again and again.
+It is DB object that is of a stored query. It is like virtual table in PostgreSQL. VIEW doesn't
+store data physcially, it simply stores the query
+*/
+
+-- constantly asking customer names and their addresses.
+
+CREATE VIEW customer_info AS
+SELECT first_name,last_name, address FROM customer
+INNER JOIN address
+ON customer.address_id=address.address_id;
+
+SELECT * FROM customer_info; 
+
+-- Add distirct column to stored query 
+
+CREATE OR REPLACE VIEW customer_info AS
+SELECT first_name,last_name, address,district FROM customer
+INNER JOIN address
+ON customer.address_id=address.address_id;
+
+SELECT * FROM customer_info;
+
+DROP VIEW IF EXISTS customer_info --- remove the view
+ALTER VIEW customer_info AS c_info -- rename the view
+
+-------------------------------- Module Ends ------------------------------------------
