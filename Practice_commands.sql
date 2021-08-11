@@ -832,6 +832,3 @@ SELECT
   ROUND(AVG(tree_dbh),2) AS avg_tree_dbh
 FROM
   `bigquery-public-data.new_york_trees.tree_census_2015`
-
------------------------------------------------------------------------------------------------
-/* GROUP BY with Multiple Columns*/
