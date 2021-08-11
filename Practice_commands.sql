@@ -430,4 +430,408 @@ WHERE
 
 /* WHERE with TimeStamp Column */
 
-/* Timestamp into Date */
+/* Timestamp into Date  -casting means changing schema of a data type */
+
+SELECT
+  start_time AS start_time_timestamp,
+  CAST(start_time AS date) AS start_time_date
+FROM
+  `bigquery-public-data.austin_bikeshare.bikeshare_trips`
+LIMIT
+  100
+
+/* Extracting hour or any other info from TimeStamp */
+
+SELECT
+  start_time AS start_time_timestamp,
+  CAST(start_time AS date) AS start_time_date,
+
+  EXTRACT (hour
+  FROM
+    start_time) AS start_time_hour,
+
+  EXTRACT (minute
+  FROM
+    start_time) AS start_time_minute,
+
+  EXTRACT (day
+  FROM
+    start_time) AS start_time_day,
+
+  EXTRACT (year
+  FROM
+    start_time) AS start_time_year,
+    
+  EXTRACT (month
+  FROM
+    start_time) AS start_time_month,
+
+  EXTRACT (week
+  FROM
+    start_time) AS start_time_week
+FROM
+  `bigquery-public-data.austin_bikeshare.bikeshare_trips`
+LIMIT
+  100
+
+/* WHERE Clause in TimeStamp - no interger or string but can ahve greater or less than */
+
+SELECT
+  start_time AS start_time_timestamp,
+  CAST(start_time AS date) AS start_time_date,
+  EXTRACT (hour
+  FROM
+    start_time) AS start_time_hour,
+  EXTRACT (minute
+  FROM
+    start_time) AS start_time_minute,
+  EXTRACT (day
+  FROM
+    start_time) AS start_time_day,
+  EXTRACT (year
+  FROM
+    start_time) AS start_time_year,
+  EXTRACT (month
+  FROM
+    start_time) AS start_time_month,
+  EXTRACT (week
+  FROM
+    start_time) AS start_time_week
+FROM
+  `bigquery-public-data.austin_bikeshare.bikeshare_trips`
+WHERE
+  start_time > '2018-10-01'
+LIMIT
+  100
+  
+
+/* Quiz 4 */
+
+/*1. How many taxi trips started on 2015-12-31?*/
+
+SELECT
+  COUNT(DISTINCT unique_key) AS num_trips
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+WHERE
+  CAST(trip_start_timestamp AS date) = '2015-12-31'
+
+/*2. How many taxi trips started between 2015-12-23 and 2015-12-27? Include these two dates in your query.*/
+
+SELECT
+  COUNT(DISTINCT unique_key) AS num_trips
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+WHERE
+  trip_start_timestamp >= '2015-12-23'
+  AND trip_start_timestamp <= '2015-12-27'
+  
+/*3. How many trips started in the hours of (9,10,11,12) for all the years in the dataset except for 2016?*/ 
+
+SELECT
+  COUNT(DISTINCT unique_key) AS num_trips
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+WHERE
+  EXTRACT(year
+  FROM
+    trip_start_timestamp) != 2016
+  AND EXTRACT(hour
+  FROM
+    trip_start_timestamp) IN (9,
+    10,
+    11,
+    12)
+  
+  
+/*4. How many trips started within the 9th hour of the day (i.e. hour = 9) on October 31st from all the years strictly before 2017?*/
+
+SELECT
+  COUNT(DISTINCT unique_key) AS num_trips
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+WHERE
+  EXTRACT(hour
+  FROM
+    trip_start_timestamp) = 9
+  AND EXTRACT(day
+  FROM
+    trip_start_timestamp) = 31
+  AND EXTRACT(month
+  FROM
+    trip_start_timestamp) = 10
+  AND EXTRACT(year
+  FROM
+    trip_start_timestamp) < 2017
+
+
+/*5. Using only the years 2014 and 2016, how many trips started in the 16th week all together from both these two years?*/
+
+SELECT
+  COUNT(DISTINCT unique_key) AS num_trips
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+WHERE
+  EXTRACT (year
+  FROM
+    trip_start_timestamp) IN (2014,
+    2016)
+  AND EXTRACT (week
+  FROM
+    trip_start_timestamp) = 16
+
+/* WHERE clause with IS NULL and IS NOT NULL */
+
+SELECT
+  COUNT(*) AS count1,
+  COUNT(dropoff_location) AS count2
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+WHERE
+  dropoff_location IS NULL
+  
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* GROUPBY, AGGREGATION - finding total number of same entities in a list */
+
+SELECT
+  name,
+  SUM(number) AS num_people
+FROM
+  `bigquery-public-data.usa_names.usa_1910_2013`
+WHERE
+  gender ='F'
+GROUP BY
+  name
+LIMIT
+  100
+
+-----------------------------------------------------------------------------------------------
+
+SELECT
+  name,
+  SUM(number) AS num_people
+FROM
+  `bigquery-public-data.usa_names.usa_1910_2013`
+WHERE
+  gender ='F'
+GROUP BY
+  name
+ORDER BY
+  num_people DESC
+LIMIT
+  100
+
+/* Female total names group by name and grater than 500000 */
+
+SELECT
+  name,
+  SUM(number) AS num_people
+FROM
+  `bigquery-public-data.usa_names.usa_1910_2013`
+WHERE
+  gender ='F'
+GROUP BY
+  name
+HAVING 
+  num_people > 500000
+ORDER BY
+  num_people DESC
+LIMIT
+  100
+
+-----------------------------------------------------------------------------------------------
+/* Functions - MAX MIN SUM COUNT AVG */
+
+SELECT
+  payment_type,
+  COUNT(DISTINCT unique_key) AS num_trips,
+  SUM(trip_total) AS sum_trip_total,
+  AVG(trip_total) AS avg_trip_total,
+  MAX(trip_total) AS max_trip_total,
+  MIN(trip_total) AS min_trip_total
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+GROUP BY
+  payment_type
+ORDER BY
+  payment_type
+
+/* If needed only certain records use WHERE with GROUPBY */
+
+SELECT
+  payment_type,
+  COUNT(DISTINCT unique_key) AS num_trips,
+  SUM(trip_total/100) AS sum_trip_total,
+  AVG(trip_total/100) AS avg_trip_total,
+  MAX(trip_total/100) AS max_trip_total,
+  MIN(trip_total/100) AS min_trip_total
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+WHERE
+  payment_type IN ('Cash',
+    'Credit Card')
+GROUP BY
+  payment_type
+ORDER BY
+  payment_type
+
+/* If filtering is needed on aggregated results HAVING is used after GROUP BY */
+
+SELECT
+  payment_type,
+  COUNT(DISTINCT unique_key) AS num_trips,
+  SUM(trip_total/100) AS sum_trip_total,
+  AVG(trip_total/100) AS avg_trip_total,
+  MAX(trip_total/100) AS max_trip_total,
+  MIN(trip_total/100) AS min_trip_total
+FROM
+  `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+GROUP BY
+  payment_type
+HAVING
+  num_trips > 100000
+ORDER BY
+  payment_type
+  
+-----------------------------------------------------------------------------------------------
+/* Example - COUNT with WHERE Clause GROUP BY
+    = grouping hours for starttime together which are not NULL*/
+
+SELECT
+  EXTRACT(hour
+  FROM
+    starttime) AS hour,
+  COUNT(*) AS total_bike_rides
+FROM
+  `bigquery-public-data.new_york_citibike.citibike_trips`
+WHERE
+  starttime IS NOT NULL
+GROUP BY
+  hour
+ORDER BY
+  hour
+
+-----------------------------------------------------------------------------------------------
+/* Example - SUM 
+    = sum total number of crimes per major category*/
+    
+SELECT
+  major_category,
+  sum(value) as num_crimes
+FROM
+  `bigquery-public-data.london_crime.crime_by_lsoa`
+GROUP BY
+  major_category
+ORDER BY
+  num_crimes DESC
+
+-----------------------------------------------------------------------------------------------
+/* Example - MAX MIN AVG with WHERE*/
+
+SELECT
+  homeTeamName,
+  round(max(duration_minutes)/60,2) as longest_game_hours,
+  round(min(duration_minutes)/60,2) as shortest_game_hours,
+  round(avg(duration_minutes),2) as avg_game_hours,
+  max(attendance) as largest_attendance,
+  min(attendance) as minimum_attendance,
+  cast(round(avg(attendance),0) as INT64) as avg_attendance
+FROM
+  `bigquery-public-data.baseball.schedules`
+GROUP BY
+  homeTeamName
+  
+-----------------------------------------------------------------------------------------------
+/* Example -HAVING with GROUP BY*/
+
+SELECT
+  contributing_factor_vehicle_1,
+  COUNT(*) AS num_accidents
+FROM
+  `bigquery-public-data.new_york_mv_collisions.nypd_mv_collisions`
+WHERE
+  contributing_factor_vehicle_1 != 'Unspecified'
+GROUP BY
+  contributing_factor_vehicle_1
+HAVING
+  num_accidents > 10000
+ORDER BY
+  num_accidents DESC
+
+/* Quiz 5 */
+
+/*1. When counting the number of trees by health, which group within health has the least amount of trees?
+Which has the most? Note: Null can be an answer. - Good with most and null with least*/
+
+SELECT
+  health,
+  COUNT(DISTINCT tree_id) AS num_tress
+FROM
+  `bigquery-public-data.new_york_trees.tree_census_2015`
+GROUP BY
+  health
+  
+/*2. For each type of tree (use the spc_common column), calculate the average diameter (use the tree_dbh column).
+How many types of trees have an average diameter strictly greater than 10? - 40*/
+
+SELECT
+  spc_common,
+  ROUND(AVG(tree_dbh),2) AS avg_daimeter
+FROM
+  `bigquery-public-data.new_york_trees.tree_census_2015`
+GROUP BY
+  spc_common
+HAVING
+  avg_daimeter > 10
+ORDER BY
+  avg_daimeter DESC
+
+/*3. Of all the trees that have a health status of "Poor" and a tree diameter greater than 10 ( tree_dbh > 10), how many are Damaged and how many are Not Damaged (as
+measured by the sidewalk column)? - NoDamange - 6007 and Damage 3097*/
+
+SELECT
+  sidewalk,
+  COUNT(DISTINCT tree_id) AS num_trees
+FROM
+  `bigquery-public-data.new_york_trees.tree_census_2015`
+WHERE
+  tree_dbh > 10 and health = 'Poor'
+GROUP BY
+  sidewalk
+
+/*4. Consider the trees for which user_type is "TreesCount Staff" or "NYC Parks Staff", and spc_common is not "London planetree", and curb_loc is "OffsetFromCurb". For
+the trees that meet these conditions, find the maximum tree_dbh for each of the different categories/groups in the guards column.*/
+
+/* 	Helpful 45
+	  None    87
+	  Harmful 34
+    Unsure  28*/
+    
+SELECT
+  guards,
+  MAX(tree_dbh) AS max_tree_diameter
+FROM
+  `bigquery-public-data.new_york_trees.tree_census_2015`
+WHERE
+  user_type IN ('TreesCount Staff',
+    'NYC Parks Staff')
+  AND spc_common != '"London planetree'
+  AND curb_loc = 'OffsetFromCurb'
+GROUP BY
+  guards
+
+/*5. What is the maximum, minimum, and average tree_dbh across the entire data set?*/
+
+SELECT
+  MAX(tree_dbh) AS maximum_tree_dbh,
+  MIN(tree_dbh) AS minimum_tree_dbh,
+  ROUND(AVG(tree_dbh),2) AS avg_tree_dbh
+FROM
+  `bigquery-public-data.new_york_trees.tree_census_2015`
+
+-----------------------------------------------------------------------------------------------
+/* GROUP BY with Multiple Columns*/
